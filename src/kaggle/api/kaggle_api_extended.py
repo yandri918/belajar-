@@ -92,6 +92,7 @@ from kagglesdk.datasets.types.dataset_api_service import (
     ApiDatasetFile,
     ApiDataset,
     ApiCreateDatasetResponse,
+    ApiDatasetColumn,
 )
 from kagglesdk.datasets.types.dataset_enums import (
     DatasetSelectionGroup,
@@ -1565,7 +1566,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         page_token: the page token for pagination
         page_size: the number of items per page
@@ -1590,7 +1591,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         dataset_opt: an alternative option to providing a dataset
         csv_display: if True, print comma separated values instead of table
@@ -1658,7 +1659,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         file_name: the dataset configuration file
         path: if defined, download to this location
@@ -1702,7 +1703,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         path: the path to download the dataset to
         force: force the download if the file already exists (default False)
@@ -1782,7 +1783,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         dataset_opt: an alternative option to providing a dataset
         file_name: the dataset configuration file
@@ -2086,7 +2087,10 @@ class KaggleApi:
                 retry_request.is_private = not public
                 retry_request.category_ids = keywords
                 response = self.with_retry(kaggle.datasets.dataset_api_client.create_dataset)(retry_request)
-                return cast(ApiCreateDatasetResponse, response)
+                result = cast(ApiCreateDatasetResponse, response)
+                if result.error == '':
+                    result.error = None
+                return result
 
     def dataset_create_new_cli(self, folder=None, public=False, quiet=False, convert_to_csv=True, dir_mode='skip'):
         """client wrapper for creating a new dataset
@@ -3093,7 +3097,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model: the string identified of the model
+        model: the string identifier of the model
                  should be in format [owner]/[model-name]
         yes: automatic confirmation
         """
@@ -3228,12 +3232,18 @@ class KaggleApi:
 
             owner_slug, model_slug, framework, instance_slug = self.split_model_instance_string(model_instance)
 
+            framework = mi.framework.name
+            if not framework.startswith('ModelFramework.'):
+                framework = 'ModelFramework.' + framework
+            inst_type = mi.model_instance_type.name
+            if not inst_type.startswith('ModelInstanceType'):
+                inst_type = 'ModelInstanceType.' + inst_type
             data = {
                 'id': mi.id,
                 'ownerSlug': owner_slug,
                 'modelSlug': model_slug,
                 'instanceSlug': mi.slug,
-                'framework': self.short_enum_name(mi.framework.name),
+                'framework': self.short_enum_name(framework),
                 'overview': mi.overview,
                 'usage': mi.usage,
                 'licenseName': mi.license_name,
@@ -3241,7 +3251,7 @@ class KaggleApi:
                 'trainingData': mi.training_data,
                 'versionId': mi.version_id,
                 'versionNumber': mi.version_number,
-                'modelInstanceType': self.short_enum_name(mi.model_instance_type.name),
+                'modelInstanceType': self.short_enum_name(inst_type),
             }
             if mi.base_model_instance_information is not None:
                 # TODO Test this.
@@ -3397,7 +3407,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         yes: automatic confirmation
         """
@@ -3424,7 +3434,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         yes: automatic confirmation
         """
@@ -3479,7 +3489,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance version
+        model_instance: the string identifier of the model instance version
                 should be in format [owner]/[model-name]/[framework]/[instance-slug]
         page_token: token for pagination
         page_size: the number of items per page
@@ -3605,7 +3615,7 @@ class KaggleApi:
         """Create a new model instance version.
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         folder: the folder to get the metadata file from
         version_notes: the version notes to record for this new version
@@ -3842,7 +3852,7 @@ class KaggleApi:
         """Client wrapper for model_instance_version_delete
         Parameters
         ==========
-        model_instance_version: the string identified of the model instance version
+        model_instance_version: the string identifier of the model instance version
             should be in format [owner]/[model-name]/[framework]/[instance-slug]/[version-number]
         yes: automatic confirmation
         """
@@ -4101,14 +4111,15 @@ class KaggleApi:
             )
             if upload_file is not None:
                 files = request.files
-                if files:
+                if files is not None:
                     files.append(self._new_file(upload_file))
 
     def _new_file(self, file: UploadFile) -> ApiDatasetNewFile:
         new_file = ApiDatasetNewFile()
         new_file.token = file.token
         new_file.description = file.description
-        new_file.columns = file.columns
+        if file.columns:
+            new_file.columns = [ApiDatasetColumn.from_dict(file.to_dict()) for file in file.columns]
         return new_file
 
     def _upload_file_or_folder(

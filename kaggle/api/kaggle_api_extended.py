@@ -1566,7 +1566,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         page_token: the page token for pagination
         page_size: the number of items per page
@@ -1591,7 +1591,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         dataset_opt: an alternative option to providing a dataset
         csv_display: if True, print comma separated values instead of table
@@ -1659,7 +1659,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         file_name: the dataset configuration file
         path: if defined, download to this location
@@ -1703,7 +1703,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         path: the path to download the dataset to
         force: force the download if the file already exists (default False)
@@ -1783,7 +1783,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        dataset: the string identified of the dataset
+        dataset: the string identifier of the dataset
                  should be in format [owner]/[dataset-name]
         dataset_opt: an alternative option to providing a dataset
         file_name: the dataset configuration file
@@ -3097,7 +3097,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model: the string identified of the model
+        model: the string identifier of the model
                  should be in format [owner]/[model-name]
         yes: automatic confirmation
         """
@@ -3407,7 +3407,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         yes: automatic confirmation
         """
@@ -3434,7 +3434,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         yes: automatic confirmation
         """
@@ -3489,7 +3489,7 @@ class KaggleApi:
 
         Parameters
         ==========
-        model_instance: the string identified of the model instance version
+        model_instance: the string identifier of the model instance version
                 should be in format [owner]/[model-name]/[framework]/[instance-slug]
         page_token: token for pagination
         page_size: the number of items per page
@@ -3615,7 +3615,7 @@ class KaggleApi:
         """Create a new model instance version.
         Parameters
         ==========
-        model_instance: the string identified of the model instance
+        model_instance: the string identifier of the model instance
                  should be in format [owner]/[model-name]/[framework]/[instance-slug]
         folder: the folder to get the metadata file from
         version_notes: the version notes to record for this new version
@@ -3852,7 +3852,7 @@ class KaggleApi:
         """Client wrapper for model_instance_version_delete
         Parameters
         ==========
-        model_instance_version: the string identified of the model instance version
+        model_instance_version: the string identifier of the model instance version
             should be in format [owner]/[model-name]/[framework]/[instance-slug]/[version-number]
         yes: automatic confirmation
         """
